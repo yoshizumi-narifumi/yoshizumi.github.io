@@ -1,0 +1,61 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>無題ドキュメント</title>
+		<link href="style.css" rel="stylesheet" type="text/css">
+	</head>
+	<body>
+		<form id="select-lang">
+			<input type="radio" id="lang1" name="langs" value="ja-JP" checked>
+			<label for="selectChoice1">日本語</label>
+			<input type="radio" id="lang2" name="langs" value="en-US">
+			<label for="selectChoice1">アメリカ英語</label>
+			<input type="radio" id="lang3" name="langs" value="en-GB">
+			<label for="selectChoice1">イギリス英語</label>
+		</form>
+		<button id="start-btn">start</button>
+		<button id="stop-btn">stop</button>
+		<div id="result-div"></div>
+		<script>
+			var element = document.getElementById("select-lang") ;
+			var radioNodeList = element.langs;
+			var checkLang = radioNodeList.value;
+			
+			const startBtn = document.querySelector('#start-btn');
+			const stopBtn = document.querySelector('#stop-btn');
+			const resultDiv = document.querySelector('#result-div');
+			
+			SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
+			let recognition = new SpeechRecognition();
+			recognition.lang = checkLang;
+			recognition.interimResults = true;
+			recognition.continuous = true;
+			
+			let finalTranscript = ''; // 確定した(黒の)認識結果
+			
+			recognition.onresult = (event) => {
+				
+				let interimTranscript = ''; // 暫定(灰色)の認識結果
+				for (let i = event.resultIndex; i < event.results.length; i++) {
+					let transcript = event.results[i][0].transcript;
+					if (event.results[i].isFinal) {
+						finalTranscript += transcript;
+					} else {
+						interimTranscript = transcript;
+					}
+				}
+				resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
+			}
+			
+			startBtn.onclick = () => {
+				var checkLang = radioNodeList.value;
+				recognition.lang = checkLang;
+				recognition.start();
+			}
+			stopBtn.onclick = () => {
+				recognition.stop();
+			}
+		</script>
+	</body>
+</html>
